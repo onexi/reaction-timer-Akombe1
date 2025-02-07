@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Reaction Timer</title>
+  <style>
+    #box {
+      width: 150px;
+      height: 150px;
+      background-color: purple; /* Start as purple */
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Reaction Timer Game</h1>
+<div id="box"></div>
+<button id="reactionButton">Click Me!</button>
+<p id="status"></p>
+
+<script>
+  // Number of trials we want
+  const MAX_TRIALS = 3;
+  let trialCount = 0;
+  let startTime = 0;
+
+  // Start the first trial right away
+  startTrial();
+
+  // Main function to handle each trial
+  function startTrial() {
+    const box = document.getElementById("box");
+    const status = document.getElementById("status");
+
+    // Reset box to purple
+    box.style.backgroundColor = "purple";
+    status.textContent = "Wait for it...";
+
+    // Pick a random delay between 1 and 3 seconds
+    const delay = Math.floor(Math.random() * 2000) + 1000; // 1000–3000 ms
+
+    // After the delay, turn box red and mark the start time
+    setTimeout(() => {
+      box.style.backgroundColor = "red";
+      status.textContent = "Click the button NOW!";
+      startTime = Date.now(); // Record the time
+    }, delay);
+  }
+
+  // Event handler for the button click
+  document.getElementById("reactionButton").addEventListener("click", () => {
+    const box = document.getElementById("box");
+    const status = document.getElementById("status");
+
+    // Only record reaction if the box is actually red
+    if (box.style.backgroundColor === "red") {
+      const reactionTime = Date.now() - startTime; // Calculate reaction time in ms
+      trialCount++;
+
+      status.textContent = `Reaction time: ${reactionTime} ms`;
+
+      // If we haven't reached the maximum trial count, start another trial
+      if (trialCount < MAX_TRIALS) {
+        // Pause briefly before the next trial
+        setTimeout(startTrial, 1000);
+      } else {
+        // We've completed the game
+        status.textContent += " — Game Over!";
+        // Disable the button or remove event to prevent extra clicks
+        document.getElementById("reactionButton").disabled = true;
+      }
+    } else {
+      // User clicked too early
+      status.textContent = "Too soon! Wait for the box to turn red!";
+    }
+  });
+</script>
+
+</body>
+</html>
