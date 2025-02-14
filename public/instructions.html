@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Messenger App (async/await)</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: url('instructions.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 0;
+            align-items: center;
+        }
+        #chat {
+            width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .input-container input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        #sendBtn {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #sendBtn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat">
+        <h2>Messenger App</h2>
+        <div class="input-container">
+            <input id="username" type="text" placeholder="Your name" required />
+        </div>
+        <div class="input-container">
+            <input id="message" type="text" placeholder="Type your message" required autocomplete="off" />
+            <button id="sendBtn" type="button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const usernameInput = document.getElementById("username");
+            const messageInput = document.getElementById("message");
+            const sendBtn = document.getElementById("sendBtn");
+
+            async function sendMessage() {
+                const username = usernameInput.value.trim();
+                const message = messageInput.value.trim();
+
+                if (!username || !message) {
+                    alert("Please enter your name and a message before proceeding.");
+                    return;
+                }
+
+                try {
+                    // 1. Save the username in localstorage (=browser storage) for later purposes (e.g. send final game result)
+                    localStorage.setItem("username", username);
+                    // 2. Send the message to the server
+                    const response = await fetch("/message", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, message }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    
+                    messageInput.value = "";
+                    window.location.href = "main.html";
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                }
+            }
+
+            sendBtn.addEventListener("click", sendMessage);
+            messageInput.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
